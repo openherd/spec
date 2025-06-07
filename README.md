@@ -183,8 +183,7 @@ This makes them ideal for:
 
 ### Service Discovery (Bonjour)
 Relays MAY advertise themselves on the local network using [Bonjour/mDNS](https://en.wikipedia.org/wiki/Bonjour_\(software\)):
-- **Service Type**: `_http._tcp`
-- **Name**: `openherd-relay`
+- **Service Type**: `openherd._tcp`
 
 Clients can scan for local relays and POST new messages to them automatically.
 
@@ -233,6 +232,7 @@ Each registration must be:
 - Signed using the relay’s long-term key (stored locally in `.data/.secretkey`)
 - Validated with a Proof of Work (PoW) challenge:
     - SHA256(publicKey + nonce) must start with five leading zeros (`00000...`)
+    - Note: When you (re)register a node, you can specify a password to bypass asymmetric message signing.
         
 
 ### Key Management
