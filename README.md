@@ -261,3 +261,91 @@ await register({
 ### Discovery
 
 Users may browse relays via a web interface provided by the beacon server). This includes a map of active relay nodes with their SSID, nickname, and general location.
+
+## 9. Moderation
+The OpenHerd moderation system is heavily inspired by Bluesky's moderation model, aiming to separate policy enforcement from network infrastructure. No single entity dictates what content is visible or allowed. All moderation endpoints are optional and live under the `/_openherd` path.
+
+### `/labels` (GET)
+
+Returns a list of possible moderation labels, which may be assigned to posts by moderation services.
+
+**Example Response:**
+
+```json
+[
+  {
+    "label": "Homophobia",
+    "description": "Flags posts that talk about homophobia but are not homophobic themselves"
+  },
+  {
+    "label": "Depression",
+    "description": "Posts mentioning depression or suicidal ideation, for content warnings"
+  }
+]
+```
+
+### `/labels/query` (POST)
+
+Submits one or more post envelopes to check and see if they've been labeled.
+
+**Request Body:**
+
+An array of post envelopes in the same format used throughout this spec.
+
+```json
+[
+  {
+    "signature": "-----BEGIN PGP SIGNATURE-----\n\n\n-----END PGP SIGNATURE-----\n",
+    "publicKey": "-----BEGIN PGP PUBLIC KEY BLOCK-----\n\n\n-----END PGP PUBLIC KEY BLOCK-----\n",
+    "id": "02e19c086d3d404df5ec0a2fa04b66e5a4d86457",
+    "data": "{\"id\":\"02e19c086d3d404df5ec0a2fa04b66e5a4d86457\",\"text\":\"ooooh what's this\",\"latitude\":\"33.41921544899083\",\"date\":\"2025-06-04T00:01:37.926Z\",\"longitude\":\"-84.1365136299487\"}"
+  }
+]
+```
+
+**Response:**
+
+An array of labels or `null`, matching the order of submitted posts.
+
+```json
+[
+  "Depression",
+  null
+]
+```
+
+### `/labels/report` (POST)
+
+Used to manually report posts to the moderation backend.
+
+**Request Body:**
+
+An array of post envelopes being reported. Note that a `reason` field has been added,
+
+```json
+[
+  {
+    "signature": "-----BEGIN PGP SIGNATURE-----\n\n\n-----END PGP SIGNATURE-----\n",
+    "publicKey": "-----BEGIN PGP PUBLIC KEY BLOCK-----\n\n\n-----END PGP PUBLIC KEY BLOCK-----\n",
+    "id": "02e19c086d3d404df5ec0a2fa04b66e5a4d86457",
+    "data": "{\"id\":\"02e19c086d3d404df5ec0a2fa04b66e5a4d86457\",\"text\":\"ooooh what's this\",\"latitude\":\"33.41921544899083\",\"date\":\"2025-06-04T00:01:37.926Z\",\"longitude\":\"-84.1365136299487\"}",
+    "reason": "Spam"
+  }
+]
+```
+
+**Response:**
+
+```json
+{
+  "ok": true,
+  "message": "Report received",
+  "error": null,
+  "count": 1
+}
+```
+
+- `ok`: Whether the report was processed successfully.
+- `message`: Optional human-readable message.
+- `error`: Present only if `ok` is false.
+- `count`: Number of reports accepted.
