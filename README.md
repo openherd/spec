@@ -25,7 +25,7 @@ Each post or reply MUST generate a new PGP key, which serves as its unique ident
 
 - A new PGP key is generated for each post.
 - The post content is signed using the private key.
-- Location data is included as-is (consider randomizing for anonymity at the application layer).
+- Location data MUST randomized for anonymity at the application layer.
 - Posts are sent via the `posts` Gossipsub topic.
 
 ### Parent-Child Structure
